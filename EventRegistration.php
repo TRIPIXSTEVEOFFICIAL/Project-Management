@@ -1,10 +1,12 @@
 <?php
 $eventsFile = 'events.json';
 $attendeesFile = 'attendees.json';
+
 if (!file_exists($eventsFile)) file_put_contents($eventsFile, json_encode([]));
 if (!file_exists($attendeesFile)) file_put_contents($attendeesFile, json_encode([]));
 
 $events = json_decode(file_get_contents($eventsFile), true);
+$msg = '';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $attendees = json_decode(file_get_contents($attendeesFile), true);
@@ -15,6 +17,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     ];
     file_put_contents($attendeesFile, json_encode($attendees, JSON_PRETTY_PRINT));
     $msg = "Registered successfully!";
+    $_POST = [];
 }
 ?>
 <!DOCTYPE html>
@@ -38,14 +41,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <div class="col-md-6">
                     <select name="event_id" class="form-select" required>
                         <option value="">Select Event</option>
-                        <?php foreach ($events as $event): ?>
-                            <option value="<?= $event['id']; ?>"><?= htmlspecialchars($event['name']); ?></option>
-                        <?php endforeach; ?>
+                        <?php
+                        for ($i = 0; $i < count($events); $i++) {
+                            $event = $events[$i];
+                            $name = htmlspecialchars($event['name']);
+                            $id = $event['id'];
+                            echo "<option value='$id'>$name</option>";
+                        }
+                        ?>
                     </select>
                 </div>
-                <div class="col-md-6"><input type="text" name="attendee_name" class="form-control" placeholder="Your Name" required></div>
-                <div class="col-md-12"><input type="email" name="attendee_email" class="form-control" placeholder="Email" required></div>
-                <div class="col-12 text-center"><button type="submit" class="btn btn-success px-5">Sign Up</button></div>
+                <div class="col-md-6">
+                    <input type="text" name="attendee_name" class="form-control" placeholder="Your Name" required>
+                </div>
+                <div class="col-12">
+                    <input type="email" name="attendee_email" class="form-control" placeholder="Email" required>
+                </div>
+                <div class="col-12 text-center">
+                    <button type="submit" class="btn btn-success px-5">Sign Up</button>
+                </div>
             </form>
         </div>
     </div>
